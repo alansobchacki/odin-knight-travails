@@ -1,56 +1,45 @@
 class Knight
-  attr_reader :moves, :start, :finish, :current_location
+  attr_accessor :path
 
-  def initialize(start, finish)
-    @moves = 0
-    @start = start
-    @finish = finish
-    @current_location = @start
+  def initialize
+    @knight_moves = [[-2, -1], [-2, 1], [-1, -2], [-1, 2], [1, -2], [1, 2], [2, -1], [2, 1]]
   end
 
-  def travails
-    queue = [@start]
-    @visited = Set.new([@start])
+  def travails(start, stop)
+    visited = {}
+    queue = [[stop, nil]]
 
-    until queue.empty?
-      queue_size = queue.length
+    while queue.any?
+      current_cell, next_cell = queue.shift
+      next if visited.has_key?(current_cell)
 
-      queue_size.times do
-        current_square = queue.shift
-  
-        return moves if current_square == @finish
-  
-        get_valid_moves(current_square).each do |next_square|
-          unless @visited.include?(next_square)
-            @visited.add(next_square)
-            queue.push(next_square)
-          end
-        end
+      visited[current_cell] = next_cell
+
+      return build_path(start, stop, visited) if current_cell == start
+
+      possible_moves(current_cell).each do |next_move|
+        queue << [next_move, current_cell] unless visited.has_key?(next_move)
       end
-  
-      @moves += 1
     end
   end
 
-  def path_taken
-    moves = @visited.to_a.sort.uniq
-    threshold = (@finish[0] < @start[0] || @finish[1] < @start[1]) ? @start : @finish
-
-    path = moves.select { |sub_array| sub_array[0] <= threshold[0] && sub_array[1] <= threshold[1] }
-    p path
+  def possible_moves(cell)
+    @knight_moves.
+      map { |x, y| [cell.first + x, cell.last + y] }.
+      select(&method(:valid_move?))
   end
 
-  def get_valid_moves(square)
-    x, y = square
-    valid_moves = [
-      [x + 1, y + 2], [x - 2, y - 1], [x - 1, y + 2], [x + 2, y - 1],
-      [x + 1, y - 2], [x - 2, y + 1], [x - 1, y - 2], [x + 2, y + 1]
-    ]
+  def build_path(start, stop, visited)
+    @path = [start]
 
-    valid_moves.select { |new_square| valid_square?(new_square) }
+    while next_cell = visited[@path.last]
+      @path << next_cell
+    end
+
+    @path.last == stop ? @path : nil
   end
 
-  def valid_square?(square)
-    square.all? { |coord| coord.between?(0, 7) }
+  def valid_move?(cell)
+    cell.all? { |n| n >= 0 && n <= 7 }
   end
 end

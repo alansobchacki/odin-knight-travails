@@ -4,12 +4,13 @@ require_relative './lib/board.rb'
 require_relative './lib/knight.rb'
 require_relative './lib/announcer.rb'
 
-knight = Knight.new([3,3], [0,0])
+knight = Knight.new
 announcer = Announcer.new(knight)
 board = Board.new(knight)
 
-# announcer.greetings
-# board.display_board
-knight.travails
-# announcer.display_moves
-knight.path_taken
+announcer.greetings
+knight.travails([0,0], [0,1])
+announcer.display_path
+board.display_board
+announcer.display_moves
+

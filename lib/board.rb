@@ -1,6 +1,4 @@
 class Board
-  attr_accessor :grid
-
   def initialize(knight)
     @knight = knight
     @grid = []
@@ -23,11 +21,11 @@ class Board
 
   def update_board
     @grid.each_with_index do |_, index|
-      @grid[index][2] = '[ ]' if @grid[index][2] == '[♞]'
+      @grid[index][2] = '[x]' if @knight.path.include?(@grid[index][0..1])
     end
 
     @grid.each_with_index do |_, index|
-      @grid[index][2] = '[♞]' if @grid[index][0..1] == (@knight.finish)
+      @grid[index][2] = '[♞]' if @grid[index][0..1] == (@knight.path.last)
     end
   end
 end
